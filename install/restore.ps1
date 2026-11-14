@@ -128,16 +128,59 @@ if ($SkipMcp) {
 } elseif ($claudeCmd -and (Test-Path -LiteralPath $mcpFile)) {
     # 優先用 claude CLI 註冊，不直接改寫 ~/.claude.json
     $mcpObj = (Expand-Tokens (Get-Content -LiteralPath $mcpFile -Raw -Encoding UTF8) 'install/mcp-servers.json') | ConvertFrom-Json
-    foreach ($prop in $mcpObj.PSObject.Properties) {
-        $json = ($prop.Value | ConvertTo-Json -Depth 20 -Compress).Replace('"', '\"')
-        if ($DryRun) { Write-Host "would add-json mcp $($prop.Name)"; continue }
-        & $claudeCmd.Source mcp add-json -s user $prop.Name $json
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "OK   mcp $($prop.Name)"
-        } else {
-            $raw = $prop.Value | ConvertTo-Json -Depth 20 -Compress
-            Write-Host "FAIL mcp $($prop.Name)（exit $LASTEXITCODE）。可手動執行：claude mcp add-json -s user $($prop.Name) '$raw'"
+    # 依 MSVCRT 規則把單一參數組成命令列字串，避開 PowerShell 5.1 的原生參數傳遞
+    function ConvertTo-WinArg([string]$s) {
+        $bsChar = [char]92; $qChar = [char]34
+        $sb = New-Object System.Text.StringBuilder
+        [void]$sb.Append($qChar)
+        $bs = 0
+        foreach ($ch in $s.ToCharArray()) {
+            if ($ch -eq $bsChar) { $bs++; continue }
+            if ($ch -eq $qChar) { [void]$sb.Append($bsChar, $bs * 2 + 1); [void]$sb.Append($qChar) }
+            else { [void]$sb.Append($bsChar, $bs); [void]$sb.Append($ch) }
+            $bs = 0
         }
+        [void]$sb.Append($bsChar, $bs * 2)
+        [void]$sb.Append($qChar)
+        $sb.ToString()
+    }
+    foreach ($prop in $mcpObj.PSObject.Properties) {
+        $json = $prop.Value | ConvertTo-Json -Depth 20 -Compress
+        if ($DryRun) { Write-Host "would add-json mcp $($prop.Name)"; continue }
+        $manual = "claude mcp add-json -s user $($prop.Name) '" + $json.Replace("'", "'\''") + "'"
+        # 參數是否簡單（JSON 內無空白、無 \"，也無 cmd 特殊字元）：.cmd 會再經過 cmd.exe 解析，只能走簡單路徑
+        $plain = $json -notmatch '[\s%^&|<>]|\\"'
+        if ($claudeCmd.Source -like '*.exe') {
+            $psi = New-Object System.Diagnostics.ProcessStartInfo
+            $psi.FileName = $claudeCmd.Source
+            $psi.Arguments = ((@('mcp', 'add-json', '-s', 'user', $prop.Name, $json) | ForEach-Object { ConvertTo-WinArg $_ }) -join ' ')
+            $psi.UseShellExecute = $false
+            $psi.RedirectStandardInput = $true
+            $psi.RedirectStandardOutput = $true
+            $psi.RedirectStandardError = $true
+            $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+            $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+            $psi.CreateNoWindow = $true
+            $proc = [System.Diagnostics.Process]::Start($psi)
+            $proc.StandardInput.Close()
+            $errTask = $proc.StandardError.ReadToEndAsync()
+            $outText = $proc.StandardOutput.ReadToEnd() + $errTask.Result
+            $proc.WaitForExit()
+            $code = $proc.ExitCode
+        } elseif ($plain) {
+            # 原生 stderr 經 2>&1 會變成 ErrorRecord，必須暫時改成 Continue，否則 Stop 會中斷整個 restore
+            $prevEAP = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+            try { $outText = (& $claudeCmd.Source mcp add-json -s user $prop.Name ($json.Replace('"', '\"')) 2>&1 | Out-String) }
+            finally { $ErrorActionPreference = $prevEAP }
+            $code = $LASTEXITCODE
+        } else {
+            Write-Host "FAIL mcp $($prop.Name)：claude 是 .cmd，無法安全傳入含空白、引號或結尾反斜線的參數。手動指令（Git Bash）：$manual"
+            continue
+        }
+        if ($code -eq 0) { Write-Host "OK   mcp $($prop.Name)"; continue }
+        if ($outText -match 'already exists') { Write-Host "SKIP mcp $($prop.Name)（機器上已存在，保留現有設定）"; continue }
+        $firstLine = ($outText -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1)
+        Write-Host "FAIL mcp $($prop.Name)（exit $code）：$firstLine。手動指令（請在 Git Bash 執行）：$manual"
     }
 } elseif (-not (Test-Path -LiteralPath $mcpFile)) {
     Write-Host '略過 MCP 合併（repo 內沒有 mcp-servers.json）'

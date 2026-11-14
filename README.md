@@ -50,7 +50,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $HOME\claude-config\install\
 
 ## 已知限制
 
-- MCP 參數含空白時 `claude mcp add-json` 會失敗，restore 會印出可手動執行的指令。目前三筆 MCP 都沒有空白。
-- 路徑已 token 化，不同家目錄的還原尚未實測。
-- `anthropic-plugin-directory` 的外掛假設由官方 marketplace 自動提供，未實測。
-- 已安裝 advisor-loop 的機器上還原時，外掛安裝步驟的結果未實測；建議加 `-SkipPlugins`。
+- **MCP 參數傳遞（`.exe` 安裝）已修正。** 以下案例已用真 CLI 驗證可正確存入：空白、引號、結尾反斜線、`a\"b`、UNC 路徑、空字串、`%`、`|`、`^`、`&`、`<>`。
+- **非 `.exe` 安裝**（npm 的 `.cmd` / `.ps1` shim）：實測 PowerShell 會選到 `claude.ps1`。這類安裝只走簡單路徑；值含空白、引號、結尾反斜線、`%`、`|`、`^` 時會印出手動指令。`&` 與 `<>` 可正常存入。
+- 手動指令只在 Git Bash 驗證過；PowerShell 5.1 會失敗，cmd 未測。
+- **重跑 restore：** 外掛重跑是冪等的；已存在的 MCP 印 `SKIP` 並保留原值；有 `FAIL` 時結束碼仍為 0。
+- **已實測：** 官方 marketplace 會自動提供外掛（`context7` 不需先加 marketplace）；不同家目錄與不同 repo 路徑都能正確展開。
+- 沒裝 Orca 時出現的 SessionEnd hook 錯誤可以忽略。
+- fallback（找不到 claude 時改寫 `.claude.json`）只測過一組資料形狀。
