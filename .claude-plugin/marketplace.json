@@ -1,0 +1,11 @@
+{
+  "name": "claude-config",
+  "owner": { "name": "tony8077616" },
+  "plugins": [
+    {
+      "name": "advisor-loop",
+      "source": "./plugin/advisor-loop",
+      "description": "Advisor 強制迴圈：寫入前先問 advisor、結束前回報（UserPromptSubmit / PreToolUse / Stop / SubagentStart hooks）"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+    "semble":  {
+                   "command":  "uvx",
+                   "args":  [
+                                "--from",
+                                "semble[mcp]==0.6.2",
+                                "semble"
+                            ],
+                   "type":  "stdio"
+               },
+    "rea":  {
+                "command":  "cmd.exe",
+                "args":  [
+                             "/d",
+                             "/c",
+                             "npx",
+                             "-y",
+                             "rea-agents@6.5.0",
+                             "mcp"
+                         ]
+            },
+    "context7":  {
+                     "type":  "stdio",
+                     "command":  "cmd",
+                     "args":  [
+                                  "/c",
+                                  "npx",
+                                  "-y",
+                                  "@upstash/context7-mcp@latest"
+                              ],
+                     "env":  {
+
+                             }
+                 }
+}

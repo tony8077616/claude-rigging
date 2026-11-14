@@ -1,0 +1,24 @@
+# 白名單：相對於 ~/.claude 的路徑（資料夾會整包遞迴，但會排除 *.bak*、node_modules、__pycache__）
+# 不在這裡的一律不會進 repo。security/、projects/、sessions/、tmp/、state/、plugins/cache、.credentials.json 永遠排除。
+# hooks/advisor-loop 是舊副本（settings.json 未引用）；advisor-loop 本體由 plugin/advisor-loop 提供，sync 另行鏡射。
+# skills/* 由各自的工具安裝（orchestration、reverse-engineer-anything、security-audit 等），不放進 repo。
+# ponytail-modes/ 是執行時產生的狀態檔，不放進 repo。
+
+CLAUDE.md
+settings.json
+keybindings.json
+ponytail-statusline.ps1
+coralline.conf
+commands
+agents
+prompts
+scripts
+themes
+hooks/dispatch
+hooks/semble
+hooks/context-mode-cache-heal.mjs
+hooks/tmp-cleanup.js
+calico/config
+calico/update.ps1
+calico/source-commit
+calico/installed-tag

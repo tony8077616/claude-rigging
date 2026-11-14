@@ -1,0 +1,767 @@
+{
+  "env": {
+    "CONTEXT_MONITOR_COST_WARNINGS": "off",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "off",
+    "CLAUDE_CODE_USE_POWERSHELL_TOOL": "1",
+    "CLAUDE_PACKAGE_MANAGER": "bun"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": []
+  },
+  "model": "haiku",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${HOME:fwd}/.claude/hooks/dispatch/dispatch-state.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${HOME:fwd}/.claude/calico/update.ps1\" -Mode hook",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Program Files/nodejs/node.exe\" \"${HOME:fwd}/.claude/hooks/context-mode-cache-heal.mjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${HOME:fwd}/.claude/hooks/tmp-cleanup.js",
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Program Files/nodejs/node.exe",
+            "args": [
+              "${HOME:fwd}/.claude/hooks/semble/block-shell-search.js"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Program Files/nodejs/node.exe",
+            "args": [
+              "${HOME:fwd}/.claude/hooks/semble/block-shell-search.js"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Program Files/nodejs/node.exe",
+            "args": [
+              "${HOME:fwd}/.claude/hooks/semble/block-grep.js"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__plugin_context-mode_context-mode__ctx_execute|mcp__plugin_context-mode_context-mode__ctx_batch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Program Files/nodejs/node.exe",
+            "args": [
+              "${HOME:fwd}/.claude/hooks/semble/block-ctx-execute.js"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${HOME:fwd}/.claude/hooks/dispatch/dispatch-ratio.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${HOME:fwd}/.claude/hooks/dispatch/dispatch-workflow.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Elicitation": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME:fwd}/.orca/agent-hooks/orca-agent-hook.exe claude",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enableWorkflows": true,
+  "workflowSizeGuideline": "unrestricted",
+  "defaultShell": "powershell",
+  "statusLine": {
+    "type": "command",
+    "command": "${HOME:fwd}/.orca/agent-hooks/claude-statusline.cmd"
+  },
+  "enabledPlugins": {
+    "ecc@ecc": true,
+    "flightdeck@claude-flightdeck": true,
+    "ponytail@ponytail": true,
+    "cloudflare@cloudflare": true,
+    "context7@anthropic-plugin-directory": true,
+    "sepia@sepia": true,
+    "github@anthropic-plugin-directory": true,
+    "microsoft-docs@anthropic-plugin-directory": true,
+    "commit-commands@anthropic-plugin-directory": false,
+    "code-modernization@anthropic-plugin-directory": true,
+    "frontend-design@anthropic-plugin-directory": false,
+    "claude-security@anthropic-plugin-directory": true,
+    "pr-review-toolkit@anthropic-plugin-directory": false,
+    "ralph-loop@anthropic-plugin-directory": false,
+    "context-mode@context-mode": true,
+    "browser-use@synced": false,
+    "cowork-plugin-management@synced": false,
+    "typescript-native-lsp@synced": false,
+    "hookify@synced": false,
+    "code-review@synced": false,
+    "code-simplifier@synced": false,
+    "commit-commands@synced": false,
+    "explanatory-output-style@synced": false,
+    "advisor-loop@claude-config": true
+  },
+  "extraKnownMarketplaces": {
+    "ecc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/affaan-m/ECC.git"
+      },
+      "autoUpdate": true
+    },
+    "claude-flightdeck": {
+      "source": {
+        "source": "github",
+        "repo": "scasella/claude-flightdeck"
+      },
+      "autoUpdate": true
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      },
+      "autoUpdate": true
+    },
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      },
+      "autoUpdate": true
+    },
+    "sepia": {
+      "source": {
+        "source": "github",
+        "repo": "Nanako0129/sepia"
+      },
+      "autoUpdate": true
+    },
+    "context-mode": {
+      "source": {
+        "source": "github",
+        "repo": "mksglu/context-mode"
+      },
+      "autoUpdate": true
+    },
+    "claude-config": {
+      "source": {
+        "source": "directory",
+        "path": "${REPO:json}"
+      }
+    }
+  },
+  "language": "正體中文",
+  "feedbackDrafts": "notify",
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "閉眼新世界",
+      "標題上線",
+      "此處可出本",
+      "非靜止畫面",
+      "該來的總會來的",
+      "加雞腿",
+      "跨年觀影集",
+      "老兵回憶錄",
+      "你個假粉",
+      "你不要過來啊",
+      "水印",
+      "天下漫友是一家",
+      "五分鐘詛咒",
+      "我不要看繁星",
+      "我就是叫紫媽怎麼了",
+      "完全一致",
+      "心如刀哥",
+      "暫停學表情",
+      "周指活",
+      "字幕錯位",
+      "字幕組調皮了",
+      "官方吐槽",
+      "自掛東南枝",
+      "啊啊啊啊",
+      "把我血加住，我有盾牆",
+      "拔螺絲/拔網線",
+      "擺爛",
+      "creeper?",
+      "大膽創新，值得鼓勵",
+      "飛龍騎臉怎麼輸",
+      "非洲鐵頭菇",
+      "工資回收計劃",
+      "拐",
+      "刮痧",
+      "葫蘆娃救爺爺",
+      "艦長補給全保底，艦長副本零掉落",
+      "接頭霸王",
+      "今晚深淵結算",
+      "就打德",
+      "Konmai quality",
+      "快閃開我按錯了",
+      "亮血條",
+      "綠色惡魔",
+      "買bug送遊戲",
+      "夢幻聯動",
+      "盟軍情報員",
+      "那萬一贏了呢",
+      "你們沒有手機嗎",
+      "你為什麼不放大招",
+      "七個男人不如狗",
+      "審美DE化",
+      "危",
+      "猥瑣發育，別浪",
+      "我們有強大的後勤系統",
+      "鹹魚王，我當定了",
+      "西裝打團",
+      "憂鬱選人介面",
+      "雲聯動",
+      "一諾行為",
+      "正版極限國度",
+      "道歉時露出胸部是常識",
+      "你胸太小不要說話",
+      "品乳",
+      "胸不平何以平天下，乳不巨何以聚人心",
+      "兵庫北的微笑",
+      "貴圈真亂",
+      "官方玩梗",
+      "官方有病",
+      "官方整活",
+      "Hello world",
+      "好多孩子看到這個根本把持不住",
+      "男人中的男人",
+      "男校情人節",
+      "偶像是不會上廁所的",
+      "死宅真噁心",
+      "三年起步，最高死刑",
+      "石油王",
+      "哇多麼好的機會啊",
+      "我不會跳花週末而被關了起來",
+      "我好興奮呀",
+      "我們成年人看了都感覺不適",
+      "我現在冷靜到快要嚇死了",
+      "我這個人物比較特殊",
+      "謝謝茄子",
+      "一把劍就直接穿過去了",
+      "營業",
+      "御宅時尚",
+      "這是LoveLive",
+      "只選一個人的話根本沒法選啊！",
+      "傲嬌毀一生",
+      "百合無限好，可惜生不了",
+      "白色惡魔",
+      "CLANNAD是人生",
+      "CP已分",
+      "蟬在叫，人壞掉",
+      "長髮是男人的黑絲",
+      "東吳愛蘿莉，曹魏控人妻，蜀漢全是基",
+      "粉紅的切開來裡面都是黑的",
+      "七八定律/自古七八出福利",
+      "娶妻當如櫻庭葵，生女當如泉此方",
+      "五百年前是一家",
+      "玄不救非，氪不改命",
+      "在ED裡奔跑的動畫都是好動畫",
+      "紫色老太婆",
+      "主角勝於嘴炮，反派死於話多",
+      "自古OP多劇透",
+      "自古對波左邊輸",
+      "自古紅藍出CP",
+      "自古黑白是夫妻",
+      "自古藍毛多苦逼",
+      "自古肉番出燃曲",
+      "自古戲劇必出事",
+      "蘿莉有三好，身嬌腰柔易推倒",
+      "萌萌噠",
+      "萌音繞樑，三日不絕",
+      "天降軟妹",
+      "用生命把妹的男人(用生命開後宮的男人)",
+      "父母雙亡，有妹有房",
+      "恨妹不成穹",
+      "親妹妹不如乾妹妹",
+      "曬妹十天",
+      "有個能幹的妹妹真好",
+      "BL咖啡",
+      "腐眼看人基",
+      "近朱者赤，近墨者黑，近月者彎",
+      "燒死那對異性戀",
+      "為什麼我的手中多了火把和汽油",
+      "性別不同怎麼談戀愛",
+      "下巴分攻受",
+      "一對百合一對基，剩下一個是苦逼",
+      "願天下有情人都是失散多年的親兄妹",
+      "只要可愛就算是男孩子也沒關係",
+      "愛到深處自然黑",
+      "此生無悔入東方，來世願生幻想鄉",
+      "風險投資",
+      "買買買",
+      "你指尖躍動的電光，是我此生不變的信仰，唯我超電磁炮永世長存",
+      "圈地自萌",
+      "射惠主義",
+      "吾王劍鋒所指，我等心之所向",
+      "一蓮二幽三大八",
+      "柚子廚請退群",
+      "知世就是力量",
+      "慘遭動畫化",
+      "慘遭真人化",
+      "慘遭漫畫化",
+      "慘遭小說化",
+      "慘遭遊戲化",
+      "誠哥死得早",
+      "打土豪，分手辦",
+      "大自然的鬼斧神工",
+      "但是只要幸福就OK啦",
+      "地球君又杯具了",
+      "多好大美",
+      "發病",
+      "仿官風",
+      "官方逼死同人/同人逼死官方",
+      "黑深殘",
+      "畫風突變",
+      "技術宅拯救世界",
+      "記得關好門",
+      "看劇本",
+      "牛頓死得早",
+      "婆羅門",
+      "生不如加速豬，死不如剪刀狗",
+      "時代在進步",
+      "帥不過三秒",
+      "特別的氛圍",
+      "徒手拆高達",
+      "提供",
+      "鐵也，機戰吧又有人黑你了",
+      "修正",
+      "血統論",
+      "以炮會友",
+      "一群人的孤單",
+      "遠看炮塔嚇死人，近看五對負重輪",
+      "戰歌起",
+      "真叫人臉扁",
+      "自帶BGM",
+      "二人幸終",
+      "夫人窩來送水了",
+      "H Sketch One Touch",
+      "露易絲定型文",
+      "日日夜夜",
+      "如果這都不算愛",
+      "三個人結婚吧",
+      "太太我喜歡你啊",
+      "願援力與你同在",
+      "這腿我能玩一年",
+      "正確飼養你的方法",
+      "紙片人",
+      "梓喵打醬油",
+      "最終回發情期",
+      "Steam四大名著",
+      "此人沒有自己的單人tag",
+      "放飛自我",
+      "公款追星",
+      "還是種田比較適合老子",
+      "還有這種操作？",
+      "interesting",
+      "夾腳",
+      "降智打擊",
+      "勁大",
+      "君日本語本當上手",
+      "開除二次元",
+      "老實點每次掃黃都有你",
+      "力速雙A弱女子",
+      "莓良心",
+      "冥風淳樸，使風日下",
+      "你們這群傢伙別老是把聲優和角色關聯到一起啊",
+      "你到底用你那雙眼睛在看什麼",
+      "你可千萬不能變成那樣",
+      "你太甜了",
+      "帥哥你誰啊/美女你誰啊",
+      "拉邦結派",
+      "然而並沒有什麼卵用",
+      "聲優不要錢系列",
+      "聲優怒領工資",
+      "四天王有五人",
+      "她是一名魁梧女子",
+      "我褲子都脫了你就讓我看這個",
+      "要優雅，不要汙",
+      "一本正經地胡說八道",
+      "一人血書",
+      "因為很重要所以說了兩遍",
+      "運氣守恆定律",
+      "這遊戲能玩？",
+      "只要五官長得好，三觀跟著五官跑",
+      "致遠星戰況如何",
+      "總有一天你們會看著我畫的東西擼",
+      "最喜歡的一集",
+      "做MAD只有死路一條",
+      "這不比博人傳熱血",
+      "人是打不過狗的",
+      "驗貨",
+      "拿陽壽打牌",
+      "寶牌戰士",
+      "天和（地和）失敗的屑",
+      "暗槓讀秒/拔北讀秒",
+      "你看我需要役滿嗎",
+      "不要的役請給有需要的人",
+      "坐牢",
+      "騎馬",
+      "你打牌像毛利蘭",
+      "全切了做字一色",
+      "正義的斷么九（一番人）/天降正義",
+      "斷么怪/副露怪",
+      "中華大明槓",
+      "W棄",
+      "刮痧上分",
+      "胡北人",
+      "土門弄七",
+      "壽人棒",
+      "國士無雙的職人",
+      "LMGW",
+      "口六六口",
+      "這一炮下去我欠了3管血",
+      "放肆！",
+      "角田司馬",
+      "小心八木唯",
+      "彈幕魂天（鍵盤魂天）",
+      "銃之間",
+      "狠之間",
+      "貪之間",
+      "魚場",
+      "東風戰神",
+      "渣和",
+      "門斷平",
+      "坎邊吊",
+      "牌效率",
+      "銃一色",
+      "惡調",
+      "天地創造",
+      "累計銃滿",
+      "二度受",
+      "相公",
+      "婊",
+      "吃魚",
+      "雞打",
+      "壕",
+      "教練",
+      "神仙",
+      "龍王",
+      "燒雞",
+      "中光波",
+      "無限立直",
+      "北起輸一半",
+      "先打北，不後悔",
+      "中華何故明槓、我求理由",
+      "功夫再高，也怕斷么",
+      "鳳凰級避銃",
+      "三索必須死",
+      "演得逼真",
+      "不對日就不會死，為什麼不明白？",
+      "放銃輸一局，縮卵輸一生",
+      "壕無人性",
+      "這不科學",
+      "這種全靠運氣的垃圾遊戲",
+      "小林立都不敢這麼畫",
+      "打麻將真開心啊",
+      "我再也不打麻將了",
+      "那裡已經不是你的領域了"
+    ]
+  },
+  "modelSettings": {
+    "claude-haiku-5-5": {
+      "autoCompactWindow": 550000
+    }
+  },
+  "ultracode": true,
+  "advisorModel": "opus",
+  "pluginConfigs": {
+    "ecc@ecc": {
+      "options": {
+        "hooks_enabled": true,
+        "hook_profile": "standard"
+      }
+    },
+    "flightdeck@claude-flightdeck": {
+      "options": {
+        "motion": "while-active",
+        "moments": true,
+        "matchDescriptions": false,
+        "layout": "auto",
+        "palette": "theme",
+        "openOnStart": true,
+        "statusLine": true
+      }
+    }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "custom:orca",
+  "editorMode": "normal",
+  "verbose": true,
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: Public — <owner>/<repo> (github.com)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured",
+      "**Default / protected branches**: main (default); no rulesets or classic branch protection listed via gh for <owner>/<repo>",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine or CI runner with open internet",
+      "**Source control**: The trusted repo (<owner>/<repo>) and its remote only — no additional orgs configured",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development — maintaining a software project, PowerShell helper modules for Windows ISO refresh tooling (a Windows tooling project ecosystem)",
+      "**Trusted repo**: <project-dir> (github.com/<owner>/<repo>, public) — since public, only this repo's own work belongs here; content ported or first read from elsewhere is not its own work, and secrets/personal/confidential data are never cleared into it by visibility alone",
+      "**Org-specific CLIs**: None configured"
+    ]
+  },
+  "packageManager": "bun",
+  "execCommand": "bunx"
+}

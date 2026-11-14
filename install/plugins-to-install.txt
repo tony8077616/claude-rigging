@@ -1,0 +1,24 @@
+# 由 sync.ps1 產生。restore.ps1 會依序執行這些指令（需要 claude CLI）。
+claude plugin marketplace add https://github.com/affaan-m/ECC.git
+claude plugin marketplace add scasella/claude-flightdeck
+claude plugin marketplace add DietrichGebert/ponytail
+claude plugin marketplace add cloudflare/skills
+claude plugin marketplace add Nanako0129/sepia
+claude plugin marketplace add mksglu/context-mode
+claude plugin install ecc@ecc
+claude plugin install flightdeck@claude-flightdeck
+claude plugin install ponytail@ponytail
+claude plugin install cloudflare@cloudflare
+claude plugin install context7@anthropic-plugin-directory
+claude plugin install sepia@sepia
+claude plugin install github@anthropic-plugin-directory
+claude plugin install microsoft-docs@anthropic-plugin-directory
+claude plugin install commit-commands@anthropic-plugin-directory
+claude plugin install code-modernization@anthropic-plugin-directory
+claude plugin install feature-dev@anthropic-plugin-directory
+claude plugin install frontend-design@anthropic-plugin-directory
+claude plugin install claude-security@anthropic-plugin-directory
+claude plugin install pr-review-toolkit@anthropic-plugin-directory
+claude plugin install ralph-loop@anthropic-plugin-directory
+claude plugin install context-mode@context-mode
+claude plugin install advisor-loop@claude-config

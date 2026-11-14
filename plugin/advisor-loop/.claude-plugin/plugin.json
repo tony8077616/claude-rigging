@@ -1,0 +1,5 @@
+{
+  "name": "advisor-loop",
+  "version": "0.1.0",
+  "description": "Advisor 強制迴圈 hooks，從 settings.json 搬入的版本"
+}
