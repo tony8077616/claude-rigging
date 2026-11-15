@@ -116,6 +116,11 @@ if ($sBefore.Contains('"autoMode"') -and $sAfter -eq $sBefore) { throw 'autoMode
 # calico：SessionStart 裡獨立的一個 hook group；找不到就不動，移除後仍殘留則中止
 $sAfter2 = [regex]::Replace($sAfter, '(?ms)^      \{\r?\n        "hooks": \[\r?\n(?:(?!^      \}).)*?calico/update\.ps1.*?^      \},?\r?\n', '')
 if ($sAfter2 -match 'calico/update\.ps1') { throw 'calico hook 無法安全移除，中止' }
+# 斷言：移除的 hook 數量必須正好等於原本含 calico 的數量（避免連同 group 內其他 hook 一起被刪）
+$hookBefore = ([regex]::Matches($sAfter, '"type": "command"')).Count
+$hookAfter = ([regex]::Matches($sAfter2, '"type": "command"')).Count
+$expectRemoved = if ($sAfter -match 'calico/update\.ps1') { 1 } else { 0 }
+if ($hookBefore - $hookAfter -ne $expectRemoved) { throw "calico 移除數量不符（預期 $expectRemoved，實際 $($hookBefore - $hookAfter)），中止" }
 if ($sAfter2 -ne $sBefore) { [System.IO.File]::WriteAllText($settingsRepo, $sAfter2, $utf8NoBom) }
 Write-Host 'OK       移除 autoMode 區塊與 calico hook'
 
