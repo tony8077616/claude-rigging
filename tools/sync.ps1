@@ -107,13 +107,17 @@ foreach ($p in $installed.plugins.PSObject.Properties.Name) {
 [System.IO.File]::WriteAllText((Join-Path $Repo 'install\plugins-to-install.txt'), (($lines -join "`n") + "`n"), $utf8NoBom)
 Write-Host 'OK       plugins-to-install.txt'
 
-# ---- Step 3a：移除 autoMode 區塊（內容是每台機器自己的環境描述；還原後執行 /auto-mode-setup 重新產生）----
+# ---- Step 3a：移除 autoMode 區塊與 calico 更新 hook（repo 只收原版 Claude 也能用的設定；不依賴不屬於自己的修補版）----
 $settingsRepo = Join-Path $Repo 'claude\settings.json'
 $sBefore = [System.IO.File]::ReadAllText($settingsRepo, $utf8NoBom)
+# autoMode：內容是每台機器自己的環境描述；還原後執行 /auto-mode-setup 重新產生
 $sAfter = [regex]::Replace($sBefore, '(?ms)^  "autoMode": \{.*?^  \},?\r?\n', '')
 if ($sBefore.Contains('"autoMode"') -and $sAfter -eq $sBefore) { throw 'autoMode 區塊格式不符，無法安全移除，中止' }
-if ($sAfter -ne $sBefore) { [System.IO.File]::WriteAllText($settingsRepo, $sAfter, $utf8NoBom) }
-Write-Host 'OK       移除 autoMode 區塊'
+# calico：SessionStart 裡獨立的一個 hook group；找不到就不動，移除後仍殘留則中止
+$sAfter2 = [regex]::Replace($sAfter, '(?ms)^      \{\r?\n        "hooks": \[\r?\n(?:(?!^      \}).)*?calico/update\.ps1.*?^      \},?\r?\n', '')
+if ($sAfter2 -match 'calico/update\.ps1') { throw 'calico hook 無法安全移除，中止' }
+if ($sAfter2 -ne $sBefore) { [System.IO.File]::WriteAllText($settingsRepo, $sAfter2, $utf8NoBom) }
+Write-Host 'OK       移除 autoMode 區塊與 calico hook'
 
 # ---- Step 3b：路徑 token 化（用執行當下的自動變數 $Repo、$HOME）----
 # 本機絕對路徑換成 token（${REPO}、${HOME}，及正斜線與 JSON 跳脫寫法）；restore.ps1 會換回目標機器的路徑。

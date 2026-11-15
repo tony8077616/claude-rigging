@@ -18,6 +18,3 @@ hooks/dispatch
 hooks/semble
 hooks/context-mode-cache-heal.mjs
 hooks/tmp-cleanup.js
-calico/config
-calico/source-commit
-calico/installed-tag

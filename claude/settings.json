@@ -37,16 +37,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"${HOME:fwd}/.claude/calico/update.ps1\" -Mode hook",
-            "timeout": 10,
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
             "command": "\"C:/Program Files/nodejs/node.exe\" \"${HOME:fwd}/.claude/hooks/context-mode-cache-heal.mjs\"",
             "timeout": 10
           }

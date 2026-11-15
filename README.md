@@ -46,7 +46,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $HOME\claude-config\install\
 
 ## 刻意不收
 
-`.credentials.json`、`projects/`、`sessions/`、`security/`、`tmp/`、`state/`、外掛快取、memory（含基礎設施細節，先不收）、`~/.claude.json` 其他欄位（只取 `mcpServers`）、各工具安裝的 `skills/*`、舊副本 `hooks/advisor-loop`。
+`.credentials.json`、`projects/`、`sessions/`、`security/`、`tmp/`、`state/`、外掛快取、memory（含基礎設施細節，先不收）、`~/.claude.json` 其他欄位（只取 `mcpServers`）、各工具安裝的 `skills/*`、舊副本 `hooks/advisor-loop`、`calico/`（第三方修補版的更新器，不屬於本 repo，sync 也會移除它的 hook）。
 
 ## 已知限制
 
@@ -57,5 +57,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $HOME\claude-config\install\
 - **重跑 restore：** 外掛重跑是冪等的；已存在的 MCP 印 `SKIP` 並保留原值；有 `FAIL` 時結束碼仍為 0。
 - **已實測：** 官方 marketplace 會自動提供外掛（`context7` 不需先加 marketplace）；不同家目錄與不同 repo 路徑都能正確展開。
 - 沒裝 Orca 時出現的 SessionEnd hook 錯誤可以忽略。
-- `calico/update.ps1` 不在本 repo 內（上游與 fork 都沒有授權聲明）。`settings.json` 的 Calico 更新 hook 指向這個路徑；沒有另外安裝 Calico 的機器上，這個 hook 會報錯，可忽略。要使用時請先依 Calico 自己的安裝說明安裝。
+- 本 repo 設計為原版 Claude 也能直接使用，不依賴第三方的修補版。`sync` 匯出時會移除 Calico 的更新 hook 與 `calico/` 的檔案，所以 `settings.json` 裡不會有它。
 - fallback（找不到 claude 時改寫 `.claude.json`）已在 PS 5.1 用真實副本與合成案例測過：深度 5 的實際設定、大小寫不同的同名 key、20 位大整數、`1e-7`、`0.1`、空陣列、物件陣列、`null`、`true`、空字串 key。除 `mcpServers` 外，所有節點逐一比對一致。`ConvertTo-Json -Depth 50`，超過 50 層的資料沒有測過。
