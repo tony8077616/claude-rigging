@@ -92,7 +92,7 @@ def check_agent(p):
         add("FAIL", p, 1, "MM_AGENT_FRONTMATTER", "missing tools:")
 
 
-SCRATCH = Path("L:/TEMP/claude/8d4b169dc6c0fd90/42b2b1d4-0b92-4912-bda1-ffb3bf615afd/scratchpad")
+SCRATCH = Path(os.environ.get("TEMP") or os.getcwd()) / "check-mm-commands"  # 不寫死 session 路徑
 CALC = "def add(a, b):\n    return a + b\n"
 
 

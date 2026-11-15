@@ -107,6 +107,14 @@ foreach ($p in $installed.plugins.PSObject.Properties.Name) {
 [System.IO.File]::WriteAllText((Join-Path $Repo 'install\plugins-to-install.txt'), (($lines -join "`n") + "`n"), $utf8NoBom)
 Write-Host 'OK       plugins-to-install.txt'
 
+# ---- Step 3a：移除 autoMode 區塊（內容是每台機器自己的環境描述；還原後執行 /auto-mode-setup 重新產生）----
+$settingsRepo = Join-Path $Repo 'claude\settings.json'
+$sBefore = [System.IO.File]::ReadAllText($settingsRepo, $utf8NoBom)
+$sAfter = [regex]::Replace($sBefore, '(?ms)^  "autoMode": \{.*?^  \},?\r?\n', '')
+if ($sBefore.Contains('"autoMode"') -and $sAfter -eq $sBefore) { throw 'autoMode 區塊格式不符，無法安全移除，中止' }
+if ($sAfter -ne $sBefore) { [System.IO.File]::WriteAllText($settingsRepo, $sAfter, $utf8NoBom) }
+Write-Host 'OK       移除 autoMode 區塊'
+
 # ---- Step 3b：路徑 token 化（用執行當下的自動變數 $Repo、$HOME）----
 # 本機絕對路徑換成 token（${REPO}、${HOME}，及正斜線與 JSON 跳脫寫法）；restore.ps1 會換回目標機器的路徑。
 # 較長的路徑先換：repo 位在家目錄底下，JSON 跳脫寫法先於一般寫法。

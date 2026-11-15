@@ -1,4 +1,6 @@
 ﻿#Requires -Version 5.1
+#Requires -PSEdition Desktop
+# 必須用 Windows PowerShell 5.1 執行：pwsh 7 會重複跳脫傳給 .ps1 shim 的 JSON 參數（已實測）
 <#
   restore.ps1 - 把這個 repo 還原到 ~/.claude
 
@@ -222,7 +224,7 @@ if ($SkipPlugins) {
     foreach ($l in $fileLines) { if ($l -like 'claude plugin marketplace add *') { $plans.Add(@($l.Substring(7).Split(' '))) } }
     $plans.Add(@('plugin', 'marketplace', 'add', $Repo))
     $plans.Add(@('plugin', 'install', 'advisor-loop@claude-config'))
-    foreach ($l in $fileLines) { if ($l -like 'claude plugin install *') { $plans.Add(@($l.Substring(7).Split(' '))) } }
+    foreach ($l in $fileLines) { if ($l -like 'claude plugin install *' -and $l -notlike '*advisor-loop@claude-config*') { $plans.Add(@($l.Substring(7).Split(' '))) } }
     foreach ($p in $plans) {
         if ($DryRun) { Write-Host ('would run: claude ' + ($p -join ' ')); continue }
         Write-Host ('> claude ' + ($p -join ' '))
