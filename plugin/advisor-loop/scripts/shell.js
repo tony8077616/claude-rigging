@@ -37,8 +37,11 @@ const READ_EXPR = /^(?:\$\w+(?:\.\w+(?![\w(]))*|\.(?:IndexOf|Substring)\(|\[Math
 const SEGMENT_SPLIT = /\s*(?:;|\|\||&&|\||\r?\n)\s*/;
 
 function isReadSegment(segment, tool) {
-  // Bash 命令位置的 $ 開頭（變數、賦值、$cmd $arg）一律視為寫入；必須在去掉賦值前判斷
-  if (tool === 'Bash' && segment.trim().startsWith('$')) return false;
+  // Bash 只看命令位置：去掉開頭的 ( 與 {；$ 開頭（變數、賦值、$cmd $arg）與引號指令名一律寫入，其餘只認 READ_CMD
+  if (tool === 'Bash') {
+    const head = segment.trim().replace(/^[({]+\s*/, '');
+    return head === '' || head === '}' || head === ')' || (!head.startsWith('$') && READ_CMD.test(head));
+  }
   // 去掉前置賦值（$f = ...）、字串接續（"" + (...)）與開頭的左括號
   const s = segment.trim()
     .replace(/^\$\w+\s*=\s*/, '')
