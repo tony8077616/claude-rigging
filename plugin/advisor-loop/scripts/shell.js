@@ -22,6 +22,7 @@ const WRITE_HINT = new RegExp([
   '\\.(Delete|MoveTo|CopyTo|Create\\w*|Save|Write\\w*|Append\\w*|Kill|SetValue)\\(',
   '\\s-(delete|exec|execdir|ok|okdir|fls|fprint\\w*)\\b',
   '::(Write|Append|Delete|Move|Copy|Create|Start|Open)\\w*',
+  '(?<!\\[Math\\])::\\w+\\s*\\(',
 ].join('|'), 'i');
 
 // 已知唯讀的指令開頭（每一段都要符合才算唯讀）；指令名稱後面可接空白、右括號或字串結尾
