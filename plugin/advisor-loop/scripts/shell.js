@@ -26,7 +26,7 @@ const WRITE_HINT = new RegExp([
 ].join('|'), 'i');
 
 // 已知唯讀的指令開頭（每一段都要符合才算唯讀）；指令名稱後面可接空白、右括號或字串結尾
-const READ_CMD = /^(ls|dir|cat|head|tail|pwd|echo|cd|Set-Location|Get-ChildItem|Get-Content|Get-Item|Get-Date|Test-Path|Select-String|Select-Object|Where-Object|ForEach-Object|Measure-Object|Sort-Object|Group-Object|Format-\w+|Write-Output|Resolve-Path|grep|rg|wc|which|stat|file|find|git\s+(status|diff|log|show|rev-parse|ls-files))([\s)]|$)/i;
+const READ_CMD = /^(ls|dir|cat|head|tail|pwd|echo|cd|Set-Location|Get-ChildItem|Get-Content|Get-Item|Get-Date|Test-Path|Select-String|Select-Object|Where-Object|ForEach-Object|Measure-Object|Sort-Object|Group-Object|Format-(Table|List|Wide|Custom|Hex)|Write-Output|Resolve-Path|grep|rg|wc|which|stat|file|find|git\s+(status|diff|log|show|rev-parse|ls-files))([\s)]|$)/i;
 // 允許的唯讀運算式，逐 token 比對：$var 與屬性、僅限 IndexOf / Substring / [Math]::Max / [Math]::Min 三種呼叫、數字與運算子
 // 其他方法呼叫（例如 $x.Remove()）因為 (?![\w(]) 而配不上，會被判成寫入
 const READ_EXPR = /^(?:\$\w+(?:\.\w+(?![\w(]))*|\.(?:IndexOf|Substring)\(|\[Math\]::(?:Max|Min)\(|""|\d+|[\s+\-*\/(),{}])+$/i;
