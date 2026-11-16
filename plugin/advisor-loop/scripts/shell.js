@@ -33,7 +33,9 @@ const READ_EXPR = /^(?:\$\w+(?:\.\w+(?![\w(]))*|\.(?:IndexOf|Substring)\(|\[Math
 
 const SEGMENT_SPLIT = /\s*(?:;|\|\||&&|\||\r?\n)\s*/;
 
-function isReadSegment(segment) {
+function isReadSegment(segment, tool) {
+  // Bash 命令位置的 $ 開頭（變數、賦值、$cmd $arg）一律視為寫入；必須在去掉賦值前判斷
+  if (tool === 'Bash' && segment.trim().startsWith('$')) return false;
   // 去掉前置賦值（$f = ...）、字串接續（"" + (...)）與開頭的左括號
   const s = segment.trim()
     .replace(/^\$\w+\s*=\s*/, '')
@@ -95,7 +97,7 @@ function isWriteShell(command, tool = 'Bash') {
   // 命令替換只用來多判寫入；分段仍用原始 bare，展開不會讓寫入變唯讀
   if (tool === 'Bash' && expandSubst(bare) === null) return true;
   if (tool === 'PowerShell' && expandPs(bare) === null) return true;
-  return bare.split(SEGMENT_SPLIT).filter(Boolean).some((seg) => !isReadSegment(seg));
+  return bare.split(SEGMENT_SPLIT).filter(Boolean).some((seg) => !isReadSegment(seg, tool));
 }
 
 module.exports = { isWriteShell };
