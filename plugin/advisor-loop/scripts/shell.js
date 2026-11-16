@@ -25,6 +25,9 @@ const WRITE_HINT = new RegExp([
   '(?<!\\[Math\\])::\\w+\\s*\\(',
 ].join('|'), 'i');
 
+// 會改變狀態的 cmdlet 動詞；只在 PowerShell 比對（Bash 參數中的 add、update 等字不算）
+const PS_WRITE_HINT = /\b(?!(?:Set-Location|Start-Sleep|Clear-Host|Format-(?:Table|List|Wide|Custom|Hex))\b)(?:Stop|Restart|Suspend|Resume|Disable|Enable|Register|Unregister|Install|Uninstall|Format|Initialize|Clear|Reset|Grant|Revoke|Block|Unblock|Lock|Unlock|Add|Update|Publish|Save|Remove|New|Set|Start)-\w+/i;
+
 // 已知唯讀的指令開頭（每一段都要符合才算唯讀）；指令名稱後面可接空白、右括號或字串結尾
 const READ_CMD = /^(ls|dir|cat|head|tail|pwd|echo|cd|Set-Location|Get-ChildItem|Get-Content|Get-Item|Get-Date|Test-Path|Select-String|Select-Object|Where-Object|ForEach-Object|Measure-Object|Sort-Object|Group-Object|Format-(Table|List|Wide|Custom|Hex)|Write-Output|Resolve-Path|grep|rg|wc|which|stat|file|find|git\s+(status|diff|log|show|rev-parse|ls-files))([\s)]|$)/i;
 // 允許的唯讀運算式，逐 token 比對：$var 與屬性、僅限 IndexOf / Substring / [Math]::Max / [Math]::Min 三種呼叫、數字與運算子
@@ -94,6 +97,7 @@ function isWriteShell(command, tool = 'Bash') {
   if (typeof command !== 'string' || !command.trim()) return false;
   const bare = stripQuotes(command, tool);
   if (WRITE_HINT.test(bare)) return true;
+  if (tool === 'PowerShell' && PS_WRITE_HINT.test(bare)) return true;
   // 命令替換只用來多判寫入；分段仍用原始 bare，展開不會讓寫入變唯讀
   if (tool === 'Bash' && expandSubst(bare) === null) return true;
   if (tool === 'PowerShell' && expandPs(bare) === null) return true;
