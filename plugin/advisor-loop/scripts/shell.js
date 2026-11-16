@@ -83,7 +83,7 @@ function expandPs(text) {
     if (/['`]/.test(m[1]) || isWriteShell(m[1], 'PowerShell')) return null;
     s = s.slice(0, m.index) + '$()' + s.slice(m.index + m[0].length);
   }
-  return s;
+  return /\$\((?!\))/.test(s) ? null : s;
 }
 
 // tool 為 'Bash' 或 'PowerShell'，預設 Bash（較嚴格）
