@@ -19,7 +19,7 @@ const WRITE_HINT = new RegExp([
   '(^|[;&|\\n(]\\s*)file\\s(?:[^;|&]*\\s)?-(?:C|-compile)(?=\\s|$)',
   // rg --pre 會執行外部預處理程式；--pre-glob 不是
   '\\brg\\b[^;|&]*\\s--pre(\\s|=|$)',
-  '\\.(Delete|MoveTo|CopyTo|Create\\w*|Save|Write\\w*|Append\\w*|Kill|SetValue)\\(',
+  '\\.(Delete|MoveTo|CopyTo|Create\\w*|Save|Write\\w*|Append\\w*|Kill|SetValue|Stop|Start|Restart|Terminate)\\(',
   '\\s-(delete|exec|execdir|ok|okdir|fls|fprint\\w*)\\b',
   '::(Write|Append|Delete|Move|Copy|Create|Start|Open)\\w*',
   '(?<!\\[Math\\])::\\w+\\s*\\(',
