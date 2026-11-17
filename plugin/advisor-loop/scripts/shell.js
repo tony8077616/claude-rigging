@@ -117,6 +117,8 @@ function isWriteCore(command, tool) {
   const bare = stripQuotes(command, tool);
   if (WRITE_HINT.test(bare)) return true;
   if (tool === 'PowerShell' && PS_WRITE_HINT.test(bare)) return true;
+  // 步驟 10：括號或大括號後的 ./ .\ ../ 是路徑呼叫；只限 PowerShell，避免 Bash 的 {./a,./b} 被誤判
+  if (tool === 'PowerShell' && /[{(]\s*\.{1,2}[\\/]/.test(bare)) return true;
   // 命令替換只用來多判寫入；分段仍用原始 bare，展開不會讓寫入變唯讀
   if (tool === 'Bash' && expandSubst(bare) === null) return true;
   if (tool === 'PowerShell' && expandPs(bare) === null) return true;
