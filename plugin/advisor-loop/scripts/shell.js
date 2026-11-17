@@ -23,6 +23,7 @@ const WRITE_HINT = new RegExp([
   '\\s-(delete|exec|execdir|ok|okdir|fls|fprint\\w*)\\b',
   '::(Write|Append|Delete|Move|Copy|Create|Start|Open)\\w*',
   '(?<!\\[Math\\])::(?:\\w+\\s*[=(.]|[\\x27\\x22\\x60$(\\s])',
+  '\\.(?:IsReadOnly|Attributes|(?:LastWrite|LastAccess|Creation)Time(?:Utc)?)\\s*[-+]?=(?!=)',
 ].join('|'), 'i');
 
 // 會改變狀態的 cmdlet 動詞；只在 PowerShell 比對（Bash 參數中的 add、update 等字不算）
