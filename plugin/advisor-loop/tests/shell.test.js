@@ -49,7 +49,7 @@ test('種子 × 容器：寫入指令放進任何容器都判寫入（寫入傳�
     for (const r of SEEDS[tool].R) {
       for (const w of SEEDS[tool].W) {
         for (const cmd of CONTAINERS[tool](r, w)) {
-          if (tool === 'PowerShell' && cmd.includes('ForEach-Object') && /^[.&]/.test(w)) continue; // 已知缺口，見下方 todo 測試
+          if (tool === 'PowerShell' && cmd.includes('ForEach-Object') && /^\./.test(w)) continue; // 已知缺口，見下方 todo 測試
           expectWrite(cmd, tool);
         }
       }
@@ -59,7 +59,6 @@ test('種子 × 容器：寫入指令放進任何容器都判寫入（寫入傳�
 
 test('已知缺口（計畫步驟 10）：ForEach-Object 內的路徑呼叫 ./x 應判寫入', { todo: '步驟 10 尚未實作' }, () => {
   expectWrite('Get-ChildItem C:/x | ForEach-Object { .\\x.ps1 }', 'PowerShell');
-  expectWrite('Get-ChildItem C:/x | ForEach-Object { & ./x.ps1 }', 'PowerShell');
 });
 
 test('唯讀種子單獨與互相串接時判唯讀', () => {
