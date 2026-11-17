@@ -95,9 +95,13 @@ function expandPs(text) {
   return /\$\((?!\))/.test(s) ? null : s;
 }
 
+// 引號包住的危險旗標會被 stripQuotes 清掉，這裡對原始指令比對（只限 Bash 的 find、rg、file 命令位置）
+const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?["'](?:-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*))["']|rg\s(?:[^;&|\n]*\s)?["']--pre(?:=|["'])|file\s(?:[^;&|\n]*\s)?["'](?:-C|--compile)["'])/i;
+
 // tool 為 'Bash' 或 'PowerShell'，預設 Bash（較嚴格）
 function isWriteShell(command, tool = 'Bash') {
   if (typeof command !== 'string' || !command.trim()) return false;
+  if (tool === 'Bash' && QUOTED_FLAG_HINT.test(command)) return true;
   const bare = stripQuotes(command, tool);
   if (WRITE_HINT.test(bare)) return true;
   if (tool === 'PowerShell' && PS_WRITE_HINT.test(bare)) return true;
