@@ -16,7 +16,7 @@ const WRITE_HINT = new RegExp([
   // git diff/log 的寫檔旗標（--output 寫檔、--ext-diff 執行外部程式）；--no-ext-diff 不是
   '\\bgit\\b[^;|&]*\\s--(output(=|\\s|$)|ext\\w*)',
   // file -C／--compile 會寫出編譯檔；錨定在指令開頭，避免 grep -C 3 x file 誤判
-  '(^|[;&|\\n(]\\s*)file\\s(?:[^;|&]*\\s)?-(?:C|-compile)(?=\\s|$)',
+  '(^|[;&|\\n(]\\s*)file\\s(?:[^;|&]*\\s)?-(?:[a-z]*C[a-z]*|-compile|-comp\\w*)(?=\\s|$)',
   // rg --pre 會執行外部預處理程式；--pre-glob 不是
   '\\brg\\b[^;|&]*\\s--pre(\\s|=|$)',
   '\\.(Delete\\w*|MoveTo|CopyTo|Create\\w*|Save\\w*|Write\\w*|Append\\w*|Kill|SetValue|Stop|Start|Restart|Terminate)\\(',
@@ -96,7 +96,7 @@ function expandPs(text) {
 }
 
 // 引號包住的危險旗標會被 stripQuotes 清掉，這裡對原始指令比對（只限 Bash 的 find、rg、file 命令位置）
-const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*)(?=\s|$|[;&|)])|rg\s(?:[^;&|\n]*\s)?--pre(?:=|\s|$)|file\s(?:[^;&|\n]*\s)?-C(?=\s|$))/i;
+const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*)(?=\s|$|[;&|)])|rg\s(?:[^;&|\n]*\s)?--pre(?:=|\s|$)|file\s(?:[^;&|\n]*\s)?-(?:[a-z]*C[a-z]*|-compile|-comp\w*)(?=\s|$))/i;
 
 // tool 為 'Bash' 或 'PowerShell'，預設 Bash（較嚴格）
 // fail closed：非字串、超過 8192 字元、含 NUL、或判定拋出例外都視為寫入；空白視為唯讀
