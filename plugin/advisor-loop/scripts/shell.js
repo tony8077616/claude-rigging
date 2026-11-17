@@ -8,7 +8,7 @@
 const WRITE_HINT = new RegExp([
   '>(?!&)(?!\\s*(?:\\/dev\\/null|NUL|\\$null)(?![\\w.\\-\\x22\\x27]))',
   // >&word 會把 stdout/stderr 寫到檔案；2>&1、>&- 是 fd 操作，不算寫檔
-  '>&(?![\\d-])',
+  '>&(?!(?:\\d+|-)(?=\\s|$|[;&|)]))',
   '(?<![&>|<])&(?![&>])',
   '\\b(Remove-Item|Set-Content|Add-Content|Clear-Content|Set-ItemProperty|Set-Item|New-Item|Copy-Item|Move-Item|Rename-Item|Out-File|Export-\\w+|Tee-Object|Start-Process|Stop-Process|Invoke-\\w+|Expand-Archive|Compress-Archive)\\b',
   '\\b(rm|mv|cp|del|rmdir|mkdir|tee|sed|touch|chmod|npm|npx|bun|pip|node|python|dotnet|make|iex)\\b',
