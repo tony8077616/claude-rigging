@@ -99,8 +99,19 @@ function expandPs(text) {
 const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?["'](?:-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*))["']|rg\s(?:[^;&|\n]*\s)?["']--pre(?:=|["'])|file\s(?:[^;&|\n]*\s)?["'](?:-C|--compile)["'])/i;
 
 // tool 為 'Bash' 或 'PowerShell'，預設 Bash（較嚴格）
+// fail closed：非字串、超過 8192 字元、含 NUL、或判定拋出例外都視為寫入；空白視為唯讀
 function isWriteShell(command, tool = 'Bash') {
-  if (typeof command !== 'string' || !command.trim()) return false;
+  if (typeof command !== 'string') return true;
+  if (!command.trim()) return false;
+  if (command.length > 8192 || command.includes('\0')) return true;
+  try {
+    return isWriteCore(command, tool);
+  } catch {
+    return true;
+  }
+}
+
+function isWriteCore(command, tool) {
   if (tool === 'Bash' && QUOTED_FLAG_HINT.test(command)) return true;
   const bare = stripQuotes(command, tool);
   if (WRITE_HINT.test(bare)) return true;
