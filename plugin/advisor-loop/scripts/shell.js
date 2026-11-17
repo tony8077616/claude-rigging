@@ -96,7 +96,7 @@ function expandPs(text) {
 }
 
 // 引號包住的危險旗標會被 stripQuotes 清掉，這裡對原始指令比對（只限 Bash 的 find、rg、file 命令位置）
-const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*)(?=\s|$|[;&|)])|rg\s(?:[^;&|\n]*\s)?--pre(?:=|\s|$)|file\s(?:[^;&|\n]*\s)?-(?:[a-z]*C[a-z]*|-compile|-comp\w*)(?=\s|$))/i;
+const QUOTED_FLAG_HINT = /(?:^|[;&|\n(]\s*)(?:find\s(?:[^;&|\n]*\s)?-(?:delete|exec|execdir|ok|okdir|fls|fprint\w*)(?=\s|$|[;&|)])|rg\s(?:[^;&|\n]*\s)?--pre(?:=|\s|$)|file\s(?:[^;&|\n]*\s)?-(?:[a-z]*C[a-z]*|-compile|-comp\w*)(?=\s|$)|git\s(?:[^;&|\n]*\s)?--(?:output(?:=|\s|$)|ext\w*))/i;
 
 // tool 為 'Bash' 或 'PowerShell'，預設 Bash（較嚴格）
 // fail closed：非字串、超過 8192 字元、含 NUL、或判定拋出例外都視為寫入；空白視為唯讀
