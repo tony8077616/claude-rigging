@@ -119,7 +119,7 @@ function failureStreak(entries) {
       if (isAdvisorBlock(b)) return streak;
       if (b.type !== 'tool_result') continue;
       const use = uses.get(b.tool_use_id);
-      if (!use || !SHELL_TOOLS.has(use.name) || !isWriteShell(use.command, use.name)) continue;
+      if (!use || !SHELL_TOOLS.has(use.name) || !isWriteShell(use.command, use.name, { mode: 'stop' })) continue;
       if (GATE_RE.test(toolResultText(b))) continue;
       if (b.is_error === true) streak++;
       else return streak;
@@ -164,7 +164,7 @@ function decide(entries, blocks, maxBlocks, model = 'unknown') {
   if (tools[tools.length - 1].name === ASK_TOOL) return { block: false, why: 'asked-user' };
 
   const isAction = (t) => (ACTION_TOOLS.has(t.name) && !(t.name === 'Agent' && READ_AGENTS.has(t.subagentType)))
-    || (SHELL_TOOLS.has(t.name) && isWriteShell(t.command, t.name));
+    || (SHELL_TOOLS.has(t.name) && isWriteShell(t.command, t.name, { mode: 'stop' }));
   let lastAction = -1;
   let lastAdvisor = -1;
   tools.forEach((t, i) => {

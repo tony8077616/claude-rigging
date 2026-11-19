@@ -82,7 +82,7 @@ function main() {
   let input;
   try { input = JSON.parse(fs.readFileSync(0, 'utf8') || '{}'); } catch { return; }
   const isWrite = WRITE_TOOLS.has(input.tool_name)
-    || (SHELL_TOOLS.has(input.tool_name) && isWriteShell(input.tool_input?.command, input.tool_name));
+    || (SHELL_TOOLS.has(input.tool_name) && isWriteShell(input.tool_input?.command, input.tool_name, { mode: 'pretool' }));
   if (!isWrite) return;
   if (isSubagent(input)) return;
 
