@@ -191,6 +191,10 @@ test('PowerShell 常見別名只在命令位置判寫入；參數、路徑與引
   expectRead('Get-ChildItem C:/md/x', 'PowerShell');
   expectRead('Select-String -Pattern kill C:/x', 'PowerShell');
   expectRead("Get-ChildItem C:/x | Where-Object { $_.Name -eq 'ri' }", 'PowerShell');
+  expectRead('Get-Content C:/x | Select-String key=kill', 'PowerShell');
+  expectRead('Get-ChildItem -Filter name=md', 'PowerShell');
+  expectRead('Get-ChildItem ${kill}', 'PowerShell');
+  expectWrite('Get-ChildItem C:/x | ForEach-Object { $r = ri $_ }', 'PowerShell');
 });
 
 test('UNKNOWN 依 mode：各 mode 與未知、缺少的 mode 都判寫入；策略表不得出現 false', () => {

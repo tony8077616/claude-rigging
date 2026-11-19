@@ -127,7 +127,7 @@ function isWriteCore(command, tool) {
   // 步驟 10：括號或大括號後的 ./ .\ ../ 是路徑呼叫；只限 PowerShell，避免 Bash 的 {./a,./b} 被誤判
   if (tool === 'PowerShell' && /[{(]\s*\.{1,2}[\\/]/.test(bare)) return true;
   // 常見別名（只限命令位置，避免 ri.txt、/md/ 或引號內的字誤判）
-  if (tool === 'PowerShell' && /(?:^|[{;|(\n=]|&&)\s*(?:ri|md|kill|ii)(?=\s|$|[;|})])/i.test(bare)) return true;
+  if (tool === 'PowerShell' && /(?:^|(?<!\$)[{;|(\n]|&&|\$[\w:.]+\s*=)\s*(?:ri|md|kill|ii)(?=\s|$|[;|})])/i.test(bare)) return true;
   // 命令替換只用來多判寫入；分段仍用原始 bare，展開不會讓寫入變唯讀
   if (tool === 'Bash' && expandSubst(bare) === null) return true;
   if (tool === 'PowerShell' && expandPs(bare) === null) return true;
