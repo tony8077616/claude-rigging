@@ -4,7 +4,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { isWriteShell } = require('../scripts/shell.js');
+const { isWriteShell, UNKNOWN_POLICY } = require('../scripts/shell.js');
 
 const expectWrite = (cmd, tool = 'Bash') => assert.equal(isWriteShell(cmd, tool), true, `應判寫入：${cmd}`);
 const expectRead = (cmd, tool = 'Bash') => assert.equal(isWriteShell(cmd, tool), false, `應判唯讀：${cmd}`);
@@ -180,4 +180,25 @@ test('回報性效能案例（不判定通過與否，只印出耗時）', () =>
     const ms = Number(process.hrtime.bigint() - t0) / 1e6;
     console.log(`reported ${name}: ${ms.toFixed(1)} ms`);
   }
+});
+
+test('PowerShell 常見別名只在命令位置判寫入；參數、路徑與引號內的字判唯讀', () => {
+  expectWrite('Get-ChildItem C:/x | ForEach-Object { ri $_ }', 'PowerShell');
+  expectWrite('Get-ChildItem C:/x | ForEach-Object { $null = md $_ }', 'PowerShell');
+  expectWrite('Write-Output (kill 1)', 'PowerShell');
+  expectWrite('Get-ChildItem C:/x | ii', 'PowerShell');
+  expectRead('Get-Content ri.txt', 'PowerShell');
+  expectRead('Get-ChildItem C:/md/x', 'PowerShell');
+  expectRead('Select-String -Pattern kill C:/x', 'PowerShell');
+  expectRead("Get-ChildItem C:/x | Where-Object { $_.Name -eq 'ri' }", 'PowerShell');
+});
+
+test('UNKNOWN 依 mode：各 mode 與未知、缺少的 mode 都判寫入；策略表不得出現 false', () => {
+  for (const mode of ['pretool', 'stop', 'bogus', undefined]) {
+    assert.equal(isWriteShell(undefined, 'Bash', { mode }), true, `mode=${mode}`);
+    assert.equal(isWriteShell('a'.repeat(8193), 'Bash', { mode }), true, `mode=${mode}`);
+  }
+  assert.equal(isWriteShell('ls C:/x', 'Bash', { mode: 'stop' }), false);
+  assert.equal(Object.isFrozen(UNKNOWN_POLICY), true);
+  assert.deepEqual(Object.values(UNKNOWN_POLICY), [true, true]);
 });
